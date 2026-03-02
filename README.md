@@ -62,9 +62,3 @@ Criar uma experiência que seja:
 ## 🚧 Status
 
 > Em desenvolvimento 🚀
-
----
-
-## 🤝 Contribuição
-
-Ideias, sugestões e contribuições são bem-vindas!
