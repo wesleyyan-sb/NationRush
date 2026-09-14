@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NationRush: Desafie o mundo e aprenda geografia sem perceber. Jogo rápido, educativo e competitivo 100% no navegador.">
+    <meta name="theme-color" content="#0b0f19">
+    <title>NationRush — Desafie o mundo. Aprenda sem perceber.</title>
+    
+    <!-- Favicon SVG -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+    <!-- Tipografia Moderna (Google Fonts com Fallback Seguro) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+    <!-- Canvas para Partículas de Confetes (Vitória / Recordes) -->
+    <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
+
+    <!-- Notificações Toast Flutuantes -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- ==================== TELA 1: HOME SCREEN ==================== -->
+    <main id="home-screen" class="screen active">
+        <div class="home-container">
+            <!-- Cabeçalho & Logo -->
+            <header class="home-header">
+                <div class="logo-wrapper">
+                    <span class="logo-globe">🌍</span>
+                    <h1 class="logo-title">Nation<span class="highlight">Rush</span></h1>
+                </div>
+                <p class="logo-slogan">Desafie o mundo. Aprenda sem perceber.</p>
+                <div class="fetec-tag">
+                    <span>🎪 Apresentação Oficial FETEC</span>
+                </div>
+            </header>
+
+            <!-- Card de Perfil & Nível do Jogador -->
+            <section class="profile-card" aria-label="Progresso do Jogador">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <span id="profile-level" class="badge-level">Nível 1</span>
+                        <span id="profile-title" class="profile-title">Turista Curioso</span>
+                    </div>
+                    <span id="profile-xp-text" class="profile-xp-text">0 / 300 XP</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div id="profile-xp-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                </div>
+            </section>
+
+            <!-- Botões Principais de Ação -->
+            <section class="home-actions" aria-label="Ações Principais">
+                <button id="btn-play-rush" class="btn-primary btn-rush-glow" aria-label="Começar Rush 60">
+                    <div class="btn-inner">
+                        <span class="btn-icon">⚡</span>
+                        <div class="btn-texts">
+                            <span class="btn-main-label">JOGAR RUSH</span>
+                            <span class="btn-sub-label">60 segundos de pura adrenalina</span>
+                        </div>
+                    </div>
+                </button>
+
+                <button id="btn-play-daily" class="btn-secondary btn-daily" aria-label="Desafio Diário">
+                    <span class="btn-icon">📅</span>
+                    <div class="btn-texts">
+                        <span class="btn-main-label">DESAFIO DIÁRIO</span>
+                        <span class="btn-sub-label">10 perguntas fixas do dia</span>
+                    </div>
+                </button>
+
+                <div class="home-menu-grid">
+                    <button id="btn-open-modes" class="btn-menu-card" aria-label="Modos de Jogo">
+                        <span class="menu-icon">🎯</span>
+                        <span class="menu-label">Modos</span>
+                    </button>
+
+                    <button id="btn-open-stats" class="btn-menu-card" aria-label="Estatísticas do Jogador">
+                        <span class="menu-icon">📊</span>
+                        <span class="menu-label">Estatísticas</span>
+                    </button>
+
+                    <button id="btn-open-achievements" class="btn-menu-card" aria-label="Conquistas">
+                        <span class="menu-icon">🏆</span>
+                        <span class="menu-label">Conquistas</span>
+                    </button>
+
+                    <button id="btn-open-howtoplay" class="btn-menu-card" aria-label="Como Jogar">
+                        <span class="menu-icon">📖</span>
+                        <span class="menu-label">Tutorial</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Rodapé da Home -->
+            <footer class="home-footer">
+                <button id="btn-open-settings" class="btn-ghost-settings" aria-label="Configurações">
+                    ⚙️ Configurações
+                </button>
+                <p class="copyright-text">100% Client-Side • Desenvolvido para Feira de Ciências e Tecnologia</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- ==================== TELA 2: ARENA DO JOGO ==================== -->
+    <main id="game-screen" class="screen">
+        <div class="game-container">
+            <!-- HUD Superior -->
+            <header class="game-hud">
+                <div class="hud-left">
+                    <button id="btn-pause-game" class="btn-hud-control" aria-label="Pausar Partida">⏸️</button>
+                    <span id="hud-mode" class="hud-mode-pill">⚡ RUSH 60</span>
+                    <span id="hud-progress" class="hud-progress-pill" style="display: none;">1/10</span>
+                </div>
+
+                <div class="hud-center">
+                    <div class="hud-timer-wrap">
+                        <span id="hud-timer" class="hud-timer-digits">01:00</span>
+                    </div>
+                </div>
+
+                <div class="hud-right">
+                    <div class="hud-streak-wrap">
+                        <span id="hud-streak" class="hud-streak-text">🔥 0</span>
+                        <span id="hud-streak-badge" class="hud-streak-badge">x1.0</span>
+                    </div>
+                    <div class="hud-score-wrap">
+                        <span id="hud-score" class="hud-score-text">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Barra de Progresso do Cronômetro -->
+            <div class="hud-timer-bar-container">
+                <div id="hud-timer-bar" class="hud-timer-bar-fill" style="width: 100%;"></div>
+            </div>
+
+            <!-- Card Central da Pergunta -->
+            <section id="question-card" class="question-card" aria-live="assertive">
+                <!-- Categoria e Título -->
+                <div class="question-header">
+                    <span id="question-type-badge" class="question-badge">Bandeira</span>
+                    <h2 id="question-title" class="question-title-text">Qual país utiliza esta bandeira?</h2>
+                </div>
+
+                <!-- Conteúdo Visual Dinâmico (Bandeira, Silhueta, Mapa, Versus, etc.) -->
+                <div id="question-visual" class="question-visual-area">
+                    <!-- Preenchido dinamicamente pelo UIManager -->
+                </div>
+
+                <!-- Grade de Alternativas (ou Mapa clicável) -->
+                <div id="options-container" class="options-container">
+                    <!-- Preenchido dinamicamente pelo UIManager -->
+                </div>
+
+                <!-- Card Educativo "💡 Você Sabia?" e Feedback Pós-Resposta -->
+                <div id="feedback-card" class="feedback-card" aria-live="polite">
+                    <!-- Preenchido dinamicamente com informações ricas -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ==================== MODAL: RESULTADOS DA PARTIDA ==================== -->
+    <div id="result-modal" class="modal" role="dialog" aria-labelledby="result-title" aria-modal="true">
+        <div class="modal-card modal-result">
+            <div class="result-header">
+                <span id="result-record-tag" class="record-badge" style="display: none;">🏆 NOVO RECORDE!</span>
+                <h3 id="result-title" class="result-main-title">Partida Concluída!</h3>
+                <div class="result-score-highlight">
+                    <span id="result-score" class="result-score-number">0</span>
+                    <span class="result-score-lbl">PONTOS</span>
+                </div>
+            </div>
+
+            <div class="result-stats-row">
+                <div class="result-stat-item">
+                    <span class="stat-icon">🔥</span>
+                    <span id="result-streak" class="stat-value">0</span>
+                    <span class="stat-label">Maior Streak</span>
+                </div>
+                <div class="result-stat-item">
+                    <span class="stat-icon">🎯</span>
+                    <span id="result-accuracy" class="stat-value">0%</span>
+                    <span class="stat-label">Precisão</span>
+                </div>
+                <div class="result-stat-item">
+                    <span class="stat-icon">✅</span>
+                    <span id="result-answered" class="stat-value">0 / 0</span>
+                    <span class="stat-label">Acertos</span>
+                </div>
+                <div class="result-stat-item">
+                    <span class="stat-icon">⚡</span>
+                    <span id="result-xp-earned" class="stat-value">+0 XP</span>
+                    <span class="stat-label">Experiência</span>
+                </div>
+            </div>
+
+            <!-- Caixa de Novas Conquistas (quando houver) -->
+            <div id="result-achievements-box" class="result-achievements-box" style="display: none;"></div>
+
+            <!-- Ações do Resultado -->
+            <div class="result-actions">
+                <button id="btn-result-play-again" class="btn-primary">
+                    🔄 Jogar Novamente
+                </button>
+                <button id="btn-result-share" class="btn-secondary">
+                    📋 Copiar Resultado
+                </button>
+                <button id="btn-result-home" class="btn-ghost">
+                    🏠 Menu Principal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: MODOS DE JOGO ==================== -->
+    <div id="modes-modal" class="modal" role="dialog" aria-labelledby="modes-title" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modes-title" class="modal-title">🎯 Escolha seu Modo</h3>
+                <button class="btn-close-modal" data-close-modal aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modes-list">
+                <div class="mode-item" data-start-mode="rush">
+                    <div class="mode-item-icon">⚡</div>
+                    <div class="mode-item-body">
+                        <h4>Rush 60</h4>
+                        <p>O modo clássico e frenético. Faça a maior pontuação possível em 60 segundos com multiplicadores crescentes.</p>
+                    </div>
+                </div>
+
+                <div class="mode-item" data-start-mode="daily">
+                    <div class="mode-item-icon">📅</div>
+                    <div class="mode-item-body">
+                        <h4>Desafio Diário</h4>
+                        <p>10 desafios idênticos para todos os jogadores do dia. Compare seu desempenho com seus amigos!</p>
+                    </div>
+                </div>
+
+                <div class="mode-item" data-start-mode="fetec">
+                    <div class="mode-item-icon">🎪</div>
+                    <div class="mode-item-body">
+                        <h4>Modo FETEC (Demonstração)</h4>
+                        <p>Partida eletrizante pensada para demonstrações ao vivo em feiras e apresentações escolares.</p>
+                    </div>
+                </div>
+
+                <div class="mode-item" data-start-mode="practice">
+                    <div class="mode-item-icon">🧘</div>
+                    <div class="mode-item-body">
+                        <h4>Modo Livre (Treino)</h4>
+                        <p>Sem tempo limite. Explore o banco de países e perguntas no seu próprio ritmo para aprender.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: ESTATÍSTICAS ==================== -->
+    <div id="stats-modal" class="modal" role="dialog" aria-labelledby="stats-title" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="stats-title" class="modal-title">📊 Estatísticas Globais</h3>
+                <button class="btn-close-modal" data-close-modal aria-label="Fechar">&times;</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-total-games">0</span>
+                    <span class="stat-card-label">Partidas Jogadas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-total-questions">0</span>
+                    <span class="stat-card-label">Perguntas Respondidas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-accuracy">0%</span>
+                    <span class="stat-card-label">Precisão Média</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-best-streak">0</span>
+                    <span class="stat-card-label">Maior Streak Histórico</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-high-rush">0</span>
+                    <span class="stat-card-label">Recorde no Rush 60</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-card-num" id="stats-discovered-countries">0</span>
+                    <span class="stat-card-label">Países Descobertos</span>
+                </div>
+            </div>
+            <p class="stats-footer-hint">Todos os dados e recordes são armazenados localmente neste navegador.</p>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CONQUISTAS ==================== -->
+    <div id="achievements-modal" class="modal" role="dialog" aria-labelledby="ach-title" aria-modal="true">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <h3 id="ach-title" class="modal-title">🏆 Conquistas & Insígnias</h3>
+                <button class="btn-close-modal" data-close-modal aria-label="Fechar">&times;</button>
+            </div>
+            <div id="achievements-grid" class="achievements-grid">
+                <!-- Inserido dinamicamente pelo UIManager -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: COMO JOGAR ==================== -->
+    <div id="how-to-play-modal" class="modal" role="dialog" aria-labelledby="how-title" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="how-title" class="modal-title">📖 Como Jogar o NationRush</h3>
+                <button class="btn-close-modal" data-close-modal aria-label="Fechar">&times;</button>
+            </div>
+            <div class="how-to-play-content">
+                <div class="how-step">
+                    <span class="step-num">1</span>
+                    <div>
+                        <strong>Desafios Variados:</strong>
+                        <p>Cada rodada traz uma mecânica diferente: bandeiras, capitais, silhuetas, população, mapa interativo, moedas, fronteiras e muito mais!</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <span class="step-num">2</span>
+                    <div>
+                        <strong>Multiplicador de Streak 🔥:</strong>
+                        <p>Acertos consecutivos aumentam seu multiplicador de pontos (até x2.5). Responder rápido (< 1.8s) rende um bônus extra de velocidade!</p>
+                    </div>
+                </div>
+                <div class="how-step">
+                    <span class="step-num">3</span>
+                    <div>
+                        <strong>Aprenda sem perceber 💡:</strong>
+                        <p>Após cada desafio, um cartão "Você Sabia?" revela curiosidades geográficas e históricas reais e verificadas.</p>
+                    </div>
+                </div>
+                <div class="keyboard-tips-box">
+                    <strong>⌨️ Atalhos de Teclado no PC:</strong>
+                    <p>Use as teclas <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code> para alternativas, <code>V</code> ou <code>F</code> para Verdadeiro/Falso e <code>Esc</code> para pausar.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CONFIGURAÇÕES ==================== -->
+    <div id="settings-modal" class="modal" role="dialog" aria-labelledby="settings-title" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="settings-title" class="modal-title">⚙️ Configurações</h3>
+                <button class="btn-close-modal" data-close-modal aria-label="Fechar">&times;</button>
+            </div>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <div>
+                        <strong>Efeitos Sonoros (Web Audio)</strong>
+                        <p>Sons de acerto com arpejos melódicos, feedback de erro e fanfarras.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="setting-sound-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div>
+                        <strong>Reduzir Animações</strong>
+                        <p>Desativa efeitos visuais intensos para dispositivos mais lentos.</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="setting-motion-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item setting-danger">
+                    <div>
+                        <strong>Resetar Progresso</strong>
+                        <p>Apaga permanentemente recordes, nível e conquistas salvos no navegador.</p>
+                    </div>
+                    <button id="btn-reset-data" class="btn-danger">Resetar Tudo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: PAUSA ==================== -->
+    <div id="pause-modal" class="modal" role="dialog" aria-labelledby="pause-title" aria-modal="true">
+        <div class="modal-card modal-compact">
+            <h3 id="pause-title" class="modal-title text-center">Partida Pausada</h3>
+            <p class="text-center text-muted">O tempo parou. Respire fundo e volte quando estiver pronto!</p>
+            <div class="pause-actions">
+                <button id="btn-resume-game" class="btn-primary">▶️ Continuar</button>
+                <button id="btn-quit-game" class="btn-ghost">🚪 Sair da Partida</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts da Aplicação (Ordem de Dependências Estrita) -->
+    <script src="./js/data.js"></script>
+    <script src="./js/storage.js"></script>
+    <script src="./js/audio.js"></script>
+    <script src="./js/questions.js"></script>
+    <script src="./js/ui.js"></script>
+    <script src="./js/game.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
